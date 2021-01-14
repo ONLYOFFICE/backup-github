@@ -1,6 +1,7 @@
 #!/bin/bash 
 # A simple script to backup an organization's GitHub repositories.
 
+
 # NOTE: if you have more than 100 repositories, you'll need to step thru the list of repos 
 # returned by GitHub one page at a time, as described at https://gist.github.com/darktim/5582423
 
