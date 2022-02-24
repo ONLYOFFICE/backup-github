@@ -43,7 +43,16 @@ check mkdir -p $GHBU_BACKUP_DIR
 
 $GHBU_SILENT || echo -n "Fetching list of repositories for ${GHBU_ORG}..."
 
-REPOLIST=`check curl --silent ${GHBU_API}/orgs/${GHBU_ORG}/repos\?${GHBU_APIOPTS}page=${PAGE}\&per_page=90 -q -k | grep "\"full_name\"" | awk -F': "' '{print $2}' | sed -e 's/",//g' | sed -e 's/'${GHBU_ORG}'\///g'`
+PAGE=0
+while true; do
+  let PAGE++
+  $GHBU_SILENT || echo "getting page ${PAGE}"
+  REPOLIST_TMP=`check curl --silent -u ${GHBU_UNAME}:${GHBU_PASSWD} ${GHBU_API}/search/repositories\?q=org:${GHBU_ORG}\&page=${PAGE}\&per_page=90 -q -k | grep "\"full_name\"" | awk -F': "' '{print $2}' | sed -e 's/",//g' | sed -e 's/'${GHBU_ORG}'\///g'`
+  
+  if [ -z "${REPOLIST_TMP}" ]; then break; fi
+  REPOLIST="${REPOLIST} ${REPOLIST_TMP}"
+done
+
 # NOTE: if you're backing up a *user's* repos, not an organizations, use this instead:
 # REPOLIST=`check curl --silent -u $GHBU_UNAME:$GHBU_PASSWD ${GHBU_API}/user/repos -q | check grep "\"name\"" | check awk -F': "' '{print $2}' | check sed -e 's/",//g'`
 
